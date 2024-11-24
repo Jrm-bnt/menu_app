@@ -1,11 +1,10 @@
-import { useEffect, useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Session } from '@supabase/supabase-js'
 import { supabase } from './lib/supabase'
 import { View } from 'react-native'
-import Account from './components/Account'
 import Auth from './components/Auth'
 import LoadingScreen from './components/LoadingScreen'
-import { setEnableLogging } from 'expo/devtools'
+import BottomTabNavigator from './navigation/BottomTabNavigator'
 
 export default function App() {
   const [session, setSession] = useState<Session | null>(null)
@@ -27,6 +26,7 @@ export default function App() {
     })
 
     return () => {
+      if (subscription) subscription.unsubscribe()
       setLoading(false)
     }
   }, [])
@@ -36,8 +36,12 @@ export default function App() {
   }
 
   return (
-    <View>
-      {session && session.user ? <Account session={session} /> : <Auth />}
+    <View style={{ flex: 1 }}>
+      {session && session.user ? (
+        <BottomTabNavigator session={session} />
+      ) : (
+        <Auth />
+      )}
     </View>
   )
 }
