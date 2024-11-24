@@ -8,13 +8,14 @@ import SettingScreen from '../screens/settingsScreen/SettingScreen'
 import RecipesScreen from '../screens/recipesScreen/RecipesScreen'
 import AddRecipesScreen from '../screens/recipesScreen/AddRecipesScreen'
 import ShoppingListScreen from '../screens/shoppingScreen/ShoppingListScreen'
+import { RootStackParamList, RootTabParamList } from '../type/navigation'
 
-const Tab = createBottomTabNavigator()
-const Stack = createStackNavigator()
+const Tab = createBottomTabNavigator<RootTabParamList>()
+const Stack = createStackNavigator<RootStackParamList>()
 
 function RecipesStack() {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Recipes" component={RecipesScreen} />
       <Stack.Screen name="AddRecipe" component={AddRecipesScreen} />
     </Stack.Navigator>
@@ -26,7 +27,7 @@ export default function BottomTabNavigator({ session }: { session: any }) {
     <NavigationContainer>
       <Tab.Navigator
         screenOptions={{
-          tabBarActiveTintColor: 'tomato',
+          tabBarActiveTintColor: 'blue',
           tabBarInactiveTintColor: 'gray',
         }}
       >
@@ -39,11 +40,11 @@ export default function BottomTabNavigator({ session }: { session: any }) {
             ),
           }}
         />
-
         <Tab.Screen
           name="Recipes"
           component={RecipesStack}
           options={{
+            tabBarLabel: 'Recipes',
             tabBarIcon: ({ color, size }) => (
               <Icon name="book-outline" size={size} color={color} />
             ),

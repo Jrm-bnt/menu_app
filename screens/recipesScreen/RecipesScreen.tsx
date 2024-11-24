@@ -1,21 +1,29 @@
 import React, { useEffect, useState } from 'react'
 import { View, Text, Button, FlatList, StyleSheet } from 'react-native'
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation, NavigationProp } from '@react-navigation/native'
 import { supabase } from '../../lib/supabase'
+import { RootStackParamList } from '../../type/navigation'
+
+interface Recipe {
+  id: number
+  name: string
+  description: string
+}
 
 const RecipesScreen = () => {
-  const [recipes, setRecipes] = useState([])
-  const navigation = useNavigation()
+  const [recipes, setRecipes] = useState<Recipe[]>([])
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>()
 
   useEffect(() => {
-    fetchRecipes()
+    fetchRecipes().then((r) => console.log('r', r))
   }, [])
 
   const fetchRecipes = async () => {
     const { data, error } = await supabase.from('recipes').select('*')
     if (error) {
-      console.error(error)
+      console.error('Error fetching recipes:', error)
     } else {
+      console.log('Fetched recipes:', data)
       setRecipes(data)
     }
   }
