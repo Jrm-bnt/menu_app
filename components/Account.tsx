@@ -4,99 +4,202 @@ import { StyleSheet, View, Alert } from 'react-native'
 import { Button, Input } from '@rneui/themed'
 import { Session } from '@supabase/supabase-js'
 
+interface User {
+  id?: string
+  username: string
+  email: string
+}
+
 export default function Account({ session }: { session: Session }) {
-    const [loading, setLoading] = useState(true)
-    const [username, setUsername] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
+  const [isUserChecked, setIsUserChecked] = useState(false)
 
-    useEffect(() => {
-        if (session) getProfile()
-    }, [session])
-
-    async function getProfile() {
-        try {
-            setLoading(true)
-            if (!session?.user) throw new Error('No user on the session!')
-
-            const { data, error, status } = await supabase
-                .from('profiles')
-                .select(`username, avatar_url`)
-                .eq('id', session?.user.id)
-                .single()
-            if (error && status !== 406) {
-                throw error
-            }
-
-            if (data) {
-                setUsername(data.username)
-            }
-        } catch (error) {
-            if (error instanceof Error) {
-                Alert.alert(error.message)
-            }
-        } finally {
-            setLoading(false)
-        }
+  useEffect(() => {
+    if (session) {
+      setEmail(session.user.email)
+      checkIfUserExists()
     }
+  }, [session])
 
-    async function updateProfile({
-                                     username,
-                                     avatar_url,
-                                 }: {
-        username: string
-        avatar_url: string
-    }) {
-        try {
-            setLoading(true)
-            if (!session?.user) throw new Error('No user on the session!')
+  async function checkIfUserExists() {
+    try {
+      console.log('Checking if user exists')
+      setLoading(true)
+      if (!session?.user) throw new Error('No user on the session!')
 
-            const updates = {
-                id: session?.user.id,
-                username,
-                avatar_url,
-                updated_at: new Date(),
-            }
+      // Vérifiez si l'utilisateur existe déjà
+      const {
+        data = null,
+        error,
+        status,
+      } = await supabase
+        .from('users')
+        .select('username')
+        .eq('email', session?.user.email)
+        .single()
 
-            const { error } = await supabase.from('profiles').upsert(updates)
+      console.log('Query status:', status)
+      console.log('User data:', data)
+      console.log('User error:', error)
 
-            if (error) {
-                throw error
-            }
-        } catch (error) {
-            if (error instanceof Error) {
-                Alert.alert(error.message)
-            }
-        } finally {
-            setLoading(false)
-        }
+      if (data) {
+        setUsername((data as User).username)
+      }
+
+      setIsUserChecked(true)
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message !==
+          'JSON object requested, multiple (or no) rows returned' &&
+        error.code !== 'PGRST116'
+      ) {
+        Alert.alert(error.message)
+        console.error('Error during checkIfUserExists:', error)
+      }
+    } finally {
+      setLoading(false)
     }
+  }
 
-    return (
-        <View style={styles.container}>
-            <View style={[styles.verticallySpaced, styles.mt20]}>
-                <Input label="Email" value={session?.user?.email} disabled />
-            </View>
-            <View style={styles.verticallySpaced}>
-                <Input label="Username" value={username || ''} onChangeText={(text) => setUsername(text)} />
-            </View>
+  async function createUser() {
+    try {
+      console.log('Creating new user')
+      setLoading(true)
+      if (!session?.user) throw new Error('No user on the session!')
 
-            <View style={styles.verticallySpaced}>
-                <Button title="Sign Out" onPress={() => supabase.auth.signOut()} />
-            </View>
-        </View>
-    )
+      // Le username doit être saisi par l'utilisateur
+      if (!username) {
+        Alert.alert('Username is required')
+        return
+      }
+
+      // Créer un nouvel utilisateur
+      const newUserData = {
+        email: session.user.email,
+        username,
+      }
+      console.log('Creating new user with data:', newUserData)
+
+      const {
+        data: newUser,
+        error: insertError,
+        status: insertStatus,
+      } = await supabase
+        .from('users')
+        .upsert([newUserData], { onConflict: 'email' })
+        .single()
+
+      console.log('Upsert status:', insertStatus)
+      console.log('Insert error:', insertError)
+      console.log('New user data:', newUser)
+
+      if (insertError) throw insertError
+
+      if (newUser) {
+        setUsername((newUser as User).username)
+        Alert.alert('New user created successfully!')
+      } else {
+        console.log(
+          'New user data is null, treating as successful insertion without returning data.',
+        )
+        setEmail('')
+        Alert.alert('New user created successfully without returning data!')
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        Alert.alert(error.message)
+        console.error('Error during createUser:', error)
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function saveUserProfile() {
+    try {
+      console.log('Saving user profile')
+      setLoading(true)
+      if (!session?.user) throw new Error('No user on the session!')
+
+      const updates = {
+        email: session.user.email,
+        username,
+      }
+
+      console.log('Updating/Inserting user with data:', updates)
+
+      const { error, status } = await supabase
+        .from('users')
+        .upsert([updates], { onConflict: 'email' })
+
+      console.log('Upsert status:', status)
+      console.log('Upsert error:', error)
+
+      if (error) {
+        throw error
+      }
+
+      console.log('Profile updated successfully')
+      Alert.alert('Profile saved successfully!')
+    } catch (error) {
+      if (error instanceof Error) {
+        Alert.alert('Error saving profile:', error.message)
+        console.error('Error during saveUserProfile:', error)
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <View style={styles.container}>
+      <View style={[styles.verticallySpaced, styles.mt20]}>
+        <Input label="Email" value={session?.user?.email} disabled />
+      </View>
+      <View style={styles.verticallySpaced}>
+        <Input
+          label="Username"
+          value={username || ''}
+          onChangeText={(text) => setUsername(text)}
+        />
+      </View>
+      {!isUserChecked && (
+        <Button
+          title="Create New User"
+          disabled={loading}
+          onPress={createUser}
+        />
+      )}
+      {isUserChecked && (
+        <>
+          <Button
+            title="Save Profile"
+            disabled={loading}
+            onPress={saveUserProfile}
+          />
+          <View style={styles.verticallySpaced}>
+            <Button title="Sign Out" onPress={() => supabase.auth.signOut()} />
+          </View>
+        </>
+      )}
+    </View>
+  )
 }
 
 const styles = StyleSheet.create({
-    container: {
-        marginTop: 40,
-        padding: 12,
-    },
-    verticallySpaced: {
-        paddingTop: 4,
-        paddingBottom: 4,
-        alignSelf: 'stretch',
-    },
-    mt20: {
-        marginTop: 20,
-    },
+  container: {
+    marginTop: 40,
+    padding: 12,
+  },
+  verticallySpaced: {
+    paddingTop: 4,
+    paddingBottom: 4,
+    alignSelf: 'stretch',
+  },
+  mt20: {
+    marginTop: 20,
+  },
 })
