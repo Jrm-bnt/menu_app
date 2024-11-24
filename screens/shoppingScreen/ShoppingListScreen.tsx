@@ -1,10 +1,10 @@
-import React from 'react';
-import { View, Text } from 'react-native';
+import React from 'react'
+import { View, Text } from 'react-native'
 
 export default function ShoppingListScreen() {
-    return (
-        <View>
-            <Text>Liste de Courses</Text>
-        </View>
-    );
+  return (
+    <View>
+      <Text>Liste de Courses</Text>
+    </View>
+  )
 }
