@@ -5,6 +5,7 @@ export type RootStackParamList = {
   Recipes: undefined
   ShoppingList: undefined
   Settings: { session: any }
+  RecipeDetails: { recipeId: number }
 }
 
 export type RootTabParamList = {
