@@ -5,10 +5,11 @@ import { createStackNavigator } from '@react-navigation/stack'
 import Icon from 'react-native-vector-icons/Ionicons'
 import HomeScreen from '../screens/homeScreen/HomeScreen'
 import SettingScreen from '../screens/settingsScreen/SettingScreen'
-import RecipesScreen from '../screens/recipesScreen/RecipesScreen'
 import AddRecipesScreen from '../screens/recipesScreen/AddRecipesScreen'
 import ShoppingListScreen from '../screens/shoppingScreen/ShoppingListScreen'
 import { RootStackParamList, RootTabParamList } from '../type/navigation'
+import RecipeDetailsScreen from '../screens/recipesScreen/RecipesDetailsScreen'
+import RecipesScreen from '../screens/recipesScreen/RecipesScreen'
 
 const Tab = createBottomTabNavigator<RootTabParamList>()
 const Stack = createStackNavigator<RootStackParamList>()
@@ -18,6 +19,7 @@ function RecipesStack() {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Recipes" component={RecipesScreen} />
       <Stack.Screen name="AddRecipe" component={AddRecipesScreen} />
+      <Stack.Screen name="RecipeDetails" component={RecipeDetailsScreen} />
     </Stack.Navigator>
   )
 }

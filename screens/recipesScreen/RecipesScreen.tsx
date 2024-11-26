@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { View, Text, Button, FlatList, StyleSheet } from 'react-native'
-import { useNavigation, NavigationProp } from '@react-navigation/native'
+import { Button, FlatList, View, Text, StyleSheet } from 'react-native'
 import { supabase } from '../../lib/supabase'
+import { NavigationProp } from '@react-navigation/native'
 import { RootStackParamList } from '../../type/navigation'
 
 interface Recipe {
@@ -10,22 +10,28 @@ interface Recipe {
   description: string
 }
 
-const RecipesScreen = () => {
+type RecipesScreenProps = {
+  navigation: NavigationProp<RootStackParamList, 'Recipes'>
+}
+
+const RecipesScreen: React.FC<RecipesScreenProps> = ({ navigation }) => {
   const [recipes, setRecipes] = useState<Recipe[]>([])
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>()
 
   useEffect(() => {
-    fetchRecipes().then((r) => console.log('r', r))
+    const fetchRecipes = async () => {
+      const { data, error } = await supabase.from('recipes').select('*')
+      if (error) {
+        console.error('Error fetching recipes:', error)
+      } else {
+        setRecipes(data || [])
+      }
+    }
+
+    fetchRecipes()
   }, [])
 
-  const fetchRecipes = async () => {
-    const { data, error } = await supabase.from('recipes').select('*')
-    if (error) {
-      console.error('Error fetching recipes:', error)
-    } else {
-      console.log('Fetched recipes:', data)
-      setRecipes(data)
-    }
+  const handleViewDetails = (recipeId: number) => {
+    navigation.navigate('RecipeDetails', { recipeId })
   }
 
   return (
@@ -36,13 +42,20 @@ const RecipesScreen = () => {
         renderItem={({ item }) => (
           <View style={styles.recipeItem}>
             <Text style={styles.recipeName}>{item.name}</Text>
-            <Text>{item.description}</Text>
+            <Button
+              title="Voir les détails"
+              onPress={() => handleViewDetails(item.id)}
+            />
           </View>
         )}
+        ListEmptyComponent={
+          <Text style={styles.emptyText}>Aucune recette trouvée</Text>
+        }
       />
       <Button
-        title="Ajouter une nouvelle recette"
+        title="Ajouter une recette"
         onPress={() => navigation.navigate('AddRecipe')}
+        color="blue"
       />
     </View>
   )
@@ -62,6 +75,12 @@ const styles = StyleSheet.create({
   recipeName: {
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  emptyText: {
+    textAlign: 'center',
+    fontSize: 16,
+    marginVertical: 20,
+    color: 'gray',
   },
 })
 
