@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { supabase } from '../lib/supabase'
+import { supabase } from '../../lib/supabase'
 import { StyleSheet, View, Alert } from 'react-native'
 import { Button, Input } from '@rneui/themed'
 import { Session } from '@supabase/supabase-js'
@@ -11,7 +11,7 @@ interface User {
   email: string
 }
 
-export default function Account({ session }: { session: Session }) {
+export default function SettingScreen({ session }: { session: Session }) {
   const [loading, setLoading] = useState(true)
   const [email, setEmail] = useState('')
   const [username, setUsername] = useState('')
