@@ -1,3 +1,10 @@
+name: Build Android APK
+
+on:
+  push:
+    branches:
+      - main  # Le workflow sera déclenché sur les commits poussés sur la branche `main`.
+
 jobs:
   build-android:
     runs-on: ubuntu-latest
