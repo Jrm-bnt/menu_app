@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build APK with EAS
 
 on:
   push:
@@ -6,30 +6,28 @@ on:
       - main
 
 jobs:
-  build-android:
+  build:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout du code
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
+      # Configurer Node.js
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v2
         with:
-          node-version: 18
-          
+          node-version: '16'  # Vous pouvez adapter la version de Node.js si nécessaire
+
+      # Installer les dépendances
       - name: Install dependencies
-        run: npm install
+        run: |
+          npm install -g eas-cli
+          npm install
 
-      - name: Install eas-cli
-        run: npm install -g eas-cli
-
-      - name: Auth
+      # Utiliser le token Expo pour se connecter
+      - name: Build APK
+        run: eas build --platform android --profile production --non-interactive
         env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: echo "Authenticated with Expo"
-
-      - name: Build Android APK
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: eas build --platform android
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}  # Utilisation du secret Expo token ici
