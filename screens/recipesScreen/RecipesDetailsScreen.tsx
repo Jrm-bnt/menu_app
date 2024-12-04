@@ -100,7 +100,7 @@ const RecipeDetailsScreen = ({
         }
         renderItem={({ item }) => (
           <Text style={styles.ingredient}>
-            {item.quantity} - {item.name}
+            {item.name} - {item.quantity} - {item.unit}
           </Text>
         )}
         ListEmptyComponent={<Text>Aucun ingrédient trouvé.</Text>}
