@@ -1,38 +1,33 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Button, FlatList, View, Text, StyleSheet } from 'react-native'
 import { supabase } from '../../lib/supabase'
-import { NavigationProp } from '@react-navigation/native'
+import { NavigationProp, useFocusEffect } from '@react-navigation/native'
 import { RootStackParamList } from '../../type/navigation'
-
-interface Recipe {
-  id: number
-  name: string
-  description: string
-}
+import { Recipe } from '../../type/recipes'
 
 type RecipesScreenProps = {
   navigation: NavigationProp<RootStackParamList, 'Recipes'>
 }
 
-const RecipesScreen: React.FC<RecipesScreenProps> = ({ navigation }) => {
+const RecipesScreen = ({ navigation }: RecipesScreenProps) => {
   const [recipes, setRecipes] = useState<Recipe[]>([])
 
-  useEffect(() => {
-    const fetchRecipes = async () => {
-      const { data, error } = await supabase.from('recipes').select('*')
-      if (error) {
-        console.error('Error fetching recipes:', error)
-      } else {
-        setRecipes(data || [])
-      }
-    }
-
-    fetchRecipes()
-  }, [])
-
-  const handleViewDetails = (recipeId: number) => {
-    navigation.navigate('RecipeDetails', { recipeId })
+  const fetchRecipes = async () => {
+    const { data, error } = await supabase.from('recipes').select('*')
+    if (error) return console.error('Error fetching recipes:', error)
+    else setRecipes(data || [])
   }
+
+  const handleViewDetails = (recipe: Recipe) => {
+    navigation.navigate('RecipeDetails', { recipe })
+  }
+
+  useFocusEffect(
+    React.useCallback(() => {
+      console.log('refresh on focus')
+      fetchRecipes()
+    }, [])
+  )
 
   return (
     <View style={styles.container}>
@@ -41,11 +36,14 @@ const RecipesScreen: React.FC<RecipesScreenProps> = ({ navigation }) => {
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <View style={styles.recipeItem}>
-            <Text style={styles.recipeName}>{item.name}</Text>
-            <Button
-              title="Voir les détails"
-              onPress={() => handleViewDetails(item.id)}
-            />
+            <Text
+              style={styles.recipeName}
+              onPress={() => {
+                handleViewDetails(item)
+              }}
+            >
+              {item.name}{' '}
+            </Text>
           </View>
         )}
         ListEmptyComponent={

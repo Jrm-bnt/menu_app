@@ -1,11 +1,13 @@
+import { Recipe } from './recipes'
+import { Ingredient } from './ingredient'
+
 export type RootStackParamList = {
   Home: undefined
-  AllRecipes: { refresh: boolean }
-  AddRecipe: undefined
-  Recipes: undefined
+  AddRecipe: { recipe?: Recipe; ingredients?: Ingredient[] } | undefined
+  Recipes: { refresh: boolean }
   ShoppingList: undefined
   Settings: { session: any }
-  RecipeDetails: { recipeId: number }
+  RecipeDetails: { recipe: Recipe }
 }
 
 export type RootTabParamList = {
