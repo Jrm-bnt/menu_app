@@ -1,4 +1,4 @@
-name: Build APK with EAS
+name: Build APK and Publish OTA Updates
 
 on:
   push:
@@ -10,24 +10,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout du code
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Configurer Node.js
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '16'  # Vous pouvez adapter la version de Node.js si nécessaire
+          node-version: '16'  # Adapter si besoin
 
-      # Installer les dépendances
       - name: Install dependencies
         run: |
           npm install -g eas-cli
           npm install
 
-      # Utiliser le token Expo pour se connecter
+      - name: Publish OTA Update
+        run: eas update --branch main --platform android
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
       - name: Build APK
         run: eas build --platform android --profile production --non-interactive
         env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}  # Utilisation du secret Expo token ici
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}

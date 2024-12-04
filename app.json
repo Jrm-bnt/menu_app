@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "expo-user-management",
+    "name": "Menu",
     "slug": "expo-user-management",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -30,6 +30,15 @@
         "projectId": "f9b227ed-a322-4946-be7f-1b8875023e5b"
       }
     },
-    "owner": "jrm-bnt"
+    "owner": "jrm-bnt",
+    "updates": {
+      "enabled": true,
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0,
+      "url": "https://u.expo.dev/f9b227ed-a322-4946-be7f-1b8875023e5b"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    }
   }
 }

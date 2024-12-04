@@ -5,10 +5,37 @@ import { View } from 'react-native'
 import Auth from './components/Auth'
 import LoadingScreen from './components/LoadingScreen'
 import BottomTabNavigator from './navigation/BottomTabNavigator'
+import * as Updates from 'expo-updates'
 
 export default function App() {
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
+
+  useEffect(() => {
+    const checkForUpdates = async () => {
+      try {
+        if (Updates.isEmbeddedLaunch) {
+          console.log('App is running in a standalone environment.')
+          const update = await Updates.checkForUpdateAsync()
+          if (update.isAvailable) {
+            console.log('Update available, fetching...')
+            await Updates.fetchUpdateAsync()
+            await Updates.reloadAsync() // Recharge l'application pour appliquer la mise à jour
+          } else {
+            console.log('No updates available.')
+          }
+        } else {
+          console.log('App is running in Expo Go. Updates not supported.')
+        }
+      } catch (error) {
+        console.error(
+          'Erreur lors de la vérification des mises à jour :',
+          error
+        )
+      }
+    }
+    checkForUpdates()
+  }, [])
 
   useEffect(() => {
     // Récupérer la session actuelle
