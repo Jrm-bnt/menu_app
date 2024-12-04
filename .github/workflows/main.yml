@@ -1,4 +1,4 @@
-name: Build APK and Publish OTA Updates
+name: Build APK with EAS and Update OTA
 
 on:
   push:
@@ -16,19 +16,19 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '16'  # Adapter si besoin
+          node-version: '18'
 
       - name: Install dependencies
         run: |
           npm install -g eas-cli
           npm install
 
-      - name: Publish OTA Update
-        run: eas update --branch main --platform android
+      - name: Build APK
+        run: eas build --platform android --profile production --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Build APK
-        run: eas build --platform android --profile production --non-interactive
+      - name: Create OTA update
+        run: eas update --branch main --platform android --message "Mise à jour automatique via GitHub Actions"
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
