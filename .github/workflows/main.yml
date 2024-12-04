@@ -3,7 +3,7 @@ name: Build Android APK
 on:
   push:
     branches:
-      - main  # Le workflow sera déclenché sur les commits poussés sur la branche `main`.
+      - main
 
 jobs:
   build-android:
@@ -29,11 +29,12 @@ jobs:
         run: npm install -g eas-cli
 
       # 5. Authenticate with EAS
-      - name: Authenticate with EAS
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: eas login --token $EXPO_TOKEN
+      env:
+        EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      run: echo "Authenticated with Expo"
 
       # 6. Build Android APK
       - name: Build Android APK
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: eas build --platform android
