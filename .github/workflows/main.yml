@@ -1,4 +1,4 @@
-name: Build APK with EAS and Update OTA
+name: Deploy OTA Update
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build:
+  update:
     runs-on: ubuntu-latest
 
     steps:
@@ -23,12 +23,8 @@ jobs:
           npm install -g eas-cli
           npm install
 
-      - name: Build APK
-        run: eas build --platform android --profile production --non-interactive
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-
-      - name: Create OTA update
-        run: eas update --branch main --platform android --message "Mise à jour automatique via GitHub Actions"
+      - name: Publish OTA Update
+        run: |
+          eas update --branch main --platform android --message "Mise à jour automatique"
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}

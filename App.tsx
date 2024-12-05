@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Session } from '@supabase/supabase-js'
 import { supabase } from './lib/supabase'
-import { View } from 'react-native'
+import { Alert, View } from 'react-native'
 import Auth from './components/Auth'
 import LoadingScreen from './components/LoadingScreen'
 import BottomTabNavigator from './navigation/BottomTabNavigator'
@@ -14,26 +14,27 @@ export default function App() {
   useEffect(() => {
     const checkForUpdates = async () => {
       try {
-        if (Updates.isEmbeddedLaunch) {
-          console.log('App is running in a standalone environment.')
-          const update = await Updates.checkForUpdateAsync()
-          if (update.isAvailable) {
-            console.log('Update available, fetching...')
-            await Updates.fetchUpdateAsync()
-            await Updates.reloadAsync()
-          } else {
-            console.log('No updates available.')
-          }
-        } else {
-          console.log('App is running in Expo Go. Updates not supported.')
+        const update = await Updates.checkForUpdateAsync()
+        if (update.isAvailable) {
+          await Updates.fetchUpdateAsync()
+          Alert.alert(
+            'Mise à jour disponible',
+            'Une nouvelle version est disponible. L’application va redémarrer.',
+            [
+              {
+                text: 'OK',
+                onPress: async () => {
+                  await Updates.reloadAsync()
+                },
+              },
+            ]
+          )
         }
-      } catch (error) {
-        console.error(
-          'Erreur lors de la vérification des mises à jour :',
-          error
-        )
+      } catch (e) {
+        console.error('Erreur lors de la vérification des mises à jour :', e)
       }
     }
+
     checkForUpdates()
   }, [])
 
