@@ -53,7 +53,7 @@ const RecipesScreen = ({ navigation }: RecipesScreenProps) => {
       <Button
         title="Ajouter une recette"
         onPress={() => navigation.navigate('AddRecipe')}
-        color="blue"
+        color="green"
       />
     </View>
   )
