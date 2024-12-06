@@ -1,15 +1,15 @@
 import React, { useState } from 'react'
 import { Button, FlatList, View, Text, StyleSheet } from 'react-native'
 import { supabase } from '../../lib/supabase'
-import { NavigationProp, useFocusEffect } from '@react-navigation/native'
-import { RootStackParamList } from '../../type/navigation'
+import { useFocusEffect } from '@react-navigation/native'
 import { Recipe } from '../../type/recipes'
 
 type RecipesScreenProps = {
-  navigation: NavigationProp<RootStackParamList, 'Recipes'>
+  onSelect: (recipe: Recipe) => void
+  onAddNew: () => void
 }
 
-const RecipesScreen = ({ navigation }: RecipesScreenProps) => {
+const RecipesScreen = ({ onSelect, onAddNew }: RecipesScreenProps) => {
   const [recipes, setRecipes] = useState<Recipe[]>([])
 
   const fetchRecipes = async () => {
@@ -18,13 +18,8 @@ const RecipesScreen = ({ navigation }: RecipesScreenProps) => {
     else setRecipes(data || [])
   }
 
-  const handleViewDetails = (recipe: Recipe) => {
-    navigation.navigate('RecipeDetails', { recipe })
-  }
-
   useFocusEffect(
     React.useCallback(() => {
-      console.log('refresh on focus')
       fetchRecipes()
     }, [])
   )
@@ -39,10 +34,10 @@ const RecipesScreen = ({ navigation }: RecipesScreenProps) => {
             <Text
               style={styles.recipeName}
               onPress={() => {
-                handleViewDetails(item)
+                onSelect(item)
               }}
             >
-              {item.name}{' '}
+              {item.name}
             </Text>
           </View>
         )}
@@ -50,11 +45,7 @@ const RecipesScreen = ({ navigation }: RecipesScreenProps) => {
           <Text style={styles.emptyText}>Aucune recette trouvée</Text>
         }
       />
-      <Button
-        title="Ajouter une recette"
-        onPress={() => navigation.navigate('AddRecipe')}
-        color="green"
-      />
+      <Button title="Ajouter une recette" onPress={onAddNew} color="green" />
     </View>
   )
 }

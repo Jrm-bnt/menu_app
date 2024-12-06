@@ -1,28 +1,14 @@
 import React from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { NavigationContainer } from '@react-navigation/native'
-import { createStackNavigator } from '@react-navigation/stack'
 import Icon from 'react-native-vector-icons/Ionicons'
 import HomeScreen from '../screens/homeScreen/HomeScreen'
 import SettingScreen from '../screens/settingsScreen/SettingScreen'
-import AddRecipesScreen from '../screens/recipesScreen/AddRecipesScreen'
 import ShoppingListScreen from '../screens/shoppingScreen/ShoppingListScreen'
-import { RootStackParamList, RootTabParamList } from '../type/navigation'
-import RecipeDetailsScreen from '../screens/recipesScreen/RecipesDetailsScreen'
-import RecipesScreen from '../screens/recipesScreen/RecipesScreen'
+import { RootTabParamList } from '../type/navigation'
+import RecipeManagerScreen from '../screens/recipesScreen/RecipeManagerScreen'
 
 const Tab = createBottomTabNavigator<RootTabParamList>()
-const Stack = createStackNavigator<RootStackParamList>()
-
-function RecipesStack() {
-  return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="Recipes" component={RecipesScreen} />
-      <Stack.Screen name="AddRecipe" component={AddRecipesScreen} />
-      <Stack.Screen name="RecipeDetails" component={RecipeDetailsScreen} />
-    </Stack.Navigator>
-  )
-}
 
 export default function BottomTabNavigator({ session }: { session: any }) {
   return (
@@ -44,7 +30,7 @@ export default function BottomTabNavigator({ session }: { session: any }) {
         />
         <Tab.Screen
           name="Recipes"
-          component={RecipesStack}
+          component={RecipeManagerScreen}
           options={{
             tabBarLabel: 'Recipes',
             tabBarIcon: ({ color, size }) => (
