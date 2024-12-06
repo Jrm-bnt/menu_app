@@ -1,95 +1,85 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import React from 'react'
 import {
   View,
   Text,
   StyleSheet,
   FlatList,
   TouchableOpacity,
+  Alert,
 } from 'react-native'
 import Icon from 'react-native-vector-icons/Ionicons'
 import { supabase } from '../../lib/supabase'
-import { RouteProp } from '@react-navigation/native'
-import { RootStackParamList } from '../../type/navigation'
 import { Ingredient } from '../../type/ingredient'
+import { Recipe } from '../../type/recipes'
 
 type RecipeDetailsScreenProps = {
-  route: RouteProp<RootStackParamList, 'RecipeDetails'>
-  navigation: any
+  recipe: Recipe
+  ingredients: Ingredient[] | []
+  onEdit: (recipe: Recipe, ingredients: Ingredient[]) => void
+  onBack: () => void
 }
 
 const RecipeDetailsScreen = ({
-  route,
-  navigation,
+  recipe,
+  ingredients,
+  onEdit,
+  onBack,
 }: RecipeDetailsScreenProps) => {
-  const [recipe, setRecipe] = useState(route.params.recipe)
-  const [ingredients, setIngredients] = useState<Ingredient[]>([])
-  const [loading, setLoading] = useState<boolean>(true)
-
-  const fetchIngredients = useCallback(async () => {
+  const handleDeleteRecipe = async () => {
     try {
-      const { data: ingredientsData, error } = await supabase
-        .from('ingredients')
-        .select('*')
-        .eq('recipe_id', recipe.id)
-
-      if (error) throw error
-      setIngredients(ingredientsData || [])
-    } catch (error) {
-      console.error('Error fetching ingredients:', error)
-    } finally {
-      setLoading(false)
-    }
-  }, [recipe.id])
-
-  const refreshRecipe = useCallback(async () => {
-    try {
-      const { data: updatedRecipe, error } = await supabase
+      const { error } = await supabase
         .from('recipes')
-        .select('*')
+        .delete()
         .eq('id', recipe.id)
-        .single()
 
       if (error) throw error
-      setRecipe(updatedRecipe)
+
+      // Call the onDelete action to navigate back or update the UI
+      onBack()
     } catch (error) {
-      console.error('Error fetching updated recipe:', error)
+      console.error('Error deleting recipe:', error)
     }
-  }, [recipe.id])
-
-  useEffect(() => {
-    fetchIngredients()
-  }, [fetchIngredients])
-
-  const handleEdit = () => {
-    navigation.navigate('AddRecipe', { recipe, ingredients })
   }
 
-  const handleDelete = async () => {
-    const { error } = await supabase
-      .from('recipes')
-      .delete()
-      .eq('id', recipe.id)
-    if (error) {
-      console.error('Error deleting recipe:', error)
-    } else {
-      navigation.navigate('Recipes')
-    }
+  const confirmDelete = () => {
+    Alert.alert(
+      'Confirmer la suppression',
+      'Êtes-vous sûr de vouloir supprimer cette recette?',
+      [
+        { text: 'Annuler', style: 'cancel' },
+        {
+          text: 'Supprimer',
+          style: 'destructive',
+          onPress: handleDeleteRecipe,
+        },
+      ]
+    )
   }
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
-          {recipe.name}
-        </Text>
-        <TouchableOpacity onPress={refreshRecipe}>
-          <Icon
-            name="refresh"
-            size={24}
-            color="blue"
-            style={styles.refreshIcon}
-          />
-        </TouchableOpacity>
+        <View>
+          <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
+            {recipe.name}
+          </Text>
+        </View>
+        <View style={styles.icons}>
+          <TouchableOpacity onPress={() => onEdit(recipe, ingredients)}>
+            <Icon name="pencil" size={24} color="blue" style={styles.icon} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={confirmDelete}>
+            <Icon name="trash" size={24} color="red" style={styles.icon} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={onBack}>
+            <Icon
+              name="arrow-back"
+              size={24}
+              color="black"
+              style={styles.icon}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
       <Text style={styles.description}>{recipe.description}</Text>
       <Text style={styles.subtitle}>Ingrédients :</Text>
@@ -100,17 +90,11 @@ const RecipeDetailsScreen = ({
         }
         renderItem={({ item }) => (
           <Text style={styles.ingredient}>
-            {item.name} - {item.quantity} - {item.unit}
+            {item.name} - {item.quantity} {item.unit}
           </Text>
         )}
         ListEmptyComponent={<Text>Aucun ingrédient trouvé.</Text>}
       />
-      <TouchableOpacity onPress={handleEdit} style={styles.editButton}>
-        <Text style={styles.editButtonText}>Modifier</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={handleDelete} style={styles.deleteButton}>
-        <Text style={styles.deleteButtonText}>Supprimer</Text>
-      </TouchableOpacity>
     </View>
   )
 }
@@ -125,51 +109,30 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 16,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    flex: 1,
-    flexShrink: 1,
-    marginRight: 8,
-  },
-  refreshIcon: {
-    marginLeft: 8,
-  },
-  description: {
-    fontSize: 16,
-    marginBottom: 24,
-  },
-  subtitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginVertical: 16,
-  },
-  ingredient: {
-    fontSize: 16,
     marginBottom: 8,
   },
-  editButton: {
-    backgroundColor: 'blue',
-    padding: 12,
-    borderRadius: 8,
-    marginVertical: 8,
-    alignItems: 'center',
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    flexShrink: 1,
   },
-  editButtonText: {
-    color: '#fff',
+  icon: {
+    marginLeft: 8,
+    paddingLeft: 10,
+  },
+  icons: {
+    flexDirection: 'row',
+  },
+  description: {
+    marginBottom: 16,
+  },
+  subtitle: {
     fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 8,
   },
-  deleteButton: {
-    backgroundColor: 'red',
-    padding: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  deleteButtonText: {
-    color: '#fff',
-    fontSize: 16,
+  ingredient: {
+    paddingVertical: 4,
   },
 })
 

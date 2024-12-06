@@ -4,7 +4,7 @@ import { Ingredient } from './ingredient'
 export type RootStackParamList = {
   Home: undefined
   AddRecipe: { recipe?: Recipe; ingredients?: Ingredient[] } | undefined
-  Recipes: { refresh: boolean }
+  Recipes: undefined
   ShoppingList: undefined
   Settings: { session: any }
   RecipeDetails: { recipe: Recipe }
