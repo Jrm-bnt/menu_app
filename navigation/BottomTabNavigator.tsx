@@ -1,62 +1,61 @@
-import React from 'react'
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
-import { NavigationContainer } from '@react-navigation/native'
-import Icon from 'react-native-vector-icons/Ionicons'
+import React, { useState } from 'react'
+import { StyleSheet, View } from 'react-native'
+import { BottomNavigation } from 'react-native-paper'
 import HomeScreen from '../screens/homeScreen/HomeScreen'
 import SettingScreen from '../screens/settingsScreen/SettingScreen'
 import ShoppingListScreen from '../screens/shoppingScreen/ShoppingListScreen'
-import { RootTabParamList } from '../type/navigation'
 import RecipeManagerScreen from '../screens/recipesScreen/RecipeManagerScreen'
 
-const Tab = createBottomTabNavigator<RootTabParamList>()
+export const BottomTabNavigator = ({ session }: { session: any }) => {
+  const [index, setIndex] = useState(0)
+  const [routes] = useState([
+    {
+      key: 'home',
+      title: 'Home',
+      focusedIcon: 'calendar-month',
+      unfocusedIcon: 'calendar-month-outline',
+    },
+    {
+      key: 'recipes',
+      title: 'Recipes',
+      focusedIcon: 'book',
+      unfocusedIcon: 'book-outline',
+    },
+    {
+      key: 'shopping',
+      title: 'Shopping List',
+      focusedIcon: 'cart',
+      unfocusedIcon: 'cart-outline',
+    },
+    {
+      key: 'settings',
+      title: 'Settings',
+      focusedIcon: 'cog',
+      unfocusedIcon: 'cog-outline',
+    },
+  ])
 
-export default function BottomTabNavigator({ session }: { session: any }) {
+  const renderScene = BottomNavigation.SceneMap({
+    home: HomeScreen,
+    recipes: RecipeManagerScreen,
+    shopping: ShoppingListScreen,
+    settings: (props) => <SettingScreen {...props} session={session} />,
+  })
+
   return (
-    <NavigationContainer>
-      <Tab.Navigator
-        screenOptions={{
-          tabBarActiveTintColor: 'blue',
-          tabBarInactiveTintColor: 'gray',
-        }}
-      >
-        <Tab.Screen
-          name="Home"
-          component={HomeScreen}
-          options={{
-            tabBarIcon: ({ color, size }) => (
-              <Icon name="home-outline" size={size} color={color} />
-            ),
-          }}
-        />
-        <Tab.Screen
-          name="Recipes"
-          component={RecipeManagerScreen}
-          options={{
-            tabBarLabel: 'Recipes',
-            tabBarIcon: ({ color, size }) => (
-              <Icon name="book-outline" size={size} color={color} />
-            ),
-          }}
-        />
-        <Tab.Screen
-          name="Shopping List"
-          component={ShoppingListScreen}
-          options={{
-            tabBarIcon: ({ color, size }) => (
-              <Icon name="cart-outline" size={size} color={color} />
-            ),
-          }}
-        />
-        <Tab.Screen
-          name="Settings"
-          children={(props) => <SettingScreen {...props} session={session} />}
-          options={{
-            tabBarIcon: ({ color, size }) => (
-              <Icon name="settings-outline" size={size} color={color} />
-            ),
-          }}
-        />
-      </Tab.Navigator>
-    </NavigationContainer>
+    <View style={styles.container}>
+      <BottomNavigation
+        navigationState={{ index, routes }}
+        onIndexChange={setIndex}
+        renderScene={renderScene}
+      />
+    </View>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flexGrow: 1,
+    paddingTop: 20,
+  },
+})

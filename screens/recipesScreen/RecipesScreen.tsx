@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
-import { Button, FlatList, View, Text, StyleSheet } from 'react-native'
+import { FlatList, View, Text, StyleSheet } from 'react-native'
 import { supabase } from '../../lib/supabase'
 import { useFocusEffect } from '@react-navigation/native'
 import { Recipe } from '../../type/recipes'
+import { Button } from 'react-native-paper'
 
 type RecipesScreenProps = {
   onSelect: (recipe: Recipe) => void
@@ -45,7 +46,9 @@ const RecipesScreen = ({ onSelect, onAddNew }: RecipesScreenProps) => {
           <Text style={styles.emptyText}>Aucune recette trouvée</Text>
         }
       />
-      <Button title="Ajouter une recette" onPress={onAddNew} color="green" />
+      <Button icon="plus" mode="contained" onPress={onAddNew}>
+        Ajouter une recette
+      </Button>
     </View>
   )
 }

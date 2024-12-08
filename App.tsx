@@ -4,8 +4,11 @@ import { supabase } from './lib/supabase'
 import { Alert, View } from 'react-native'
 import Auth from './components/Auth'
 import LoadingScreen from './components/LoadingScreen'
-import BottomTabNavigator from './navigation/BottomTabNavigator'
+import { BottomTabNavigator } from './navigation/BottomTabNavigator'
 import * as Updates from 'expo-updates'
+import { PaperProvider } from 'react-native-paper'
+import { NavigationContainer } from '@react-navigation/native'
+import { theme } from './config/theme'
 
 export default function App() {
   const [session, setSession] = useState<Session | null>(null)
@@ -64,12 +67,16 @@ export default function App() {
   }
 
   return (
-    <View style={{ flex: 1 }}>
-      {session && session.user ? (
-        <BottomTabNavigator session={session} />
-      ) : (
-        <Auth />
-      )}
-    </View>
+    <PaperProvider theme={theme}>
+      <NavigationContainer>
+        <View style={{ flex: 1 }}>
+          {session && session.user ? (
+            <BottomTabNavigator session={session} />
+          ) : (
+            <Auth />
+          )}
+        </View>
+      </NavigationContainer>
+    </PaperProvider>
   )
 }

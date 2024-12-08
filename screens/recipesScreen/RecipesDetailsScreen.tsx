@@ -5,12 +5,12 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  Alert,
 } from 'react-native'
 import Icon from 'react-native-vector-icons/Ionicons'
 import { supabase } from '../../lib/supabase'
 import { Ingredient } from '../../type/ingredient'
 import { Recipe } from '../../type/recipes'
+import ConfirmationModal from '../../components/Modal'
 
 type RecipeDetailsScreenProps = {
   recipe: Recipe
@@ -25,6 +25,7 @@ const RecipeDetailsScreen = ({
   onEdit,
   onBack,
 }: RecipeDetailsScreenProps) => {
+  const [visible, setVisible] = React.useState(false)
   const handleDeleteRecipe = async () => {
     try {
       const { error } = await supabase
@@ -41,20 +42,8 @@ const RecipeDetailsScreen = ({
     }
   }
 
-  const confirmDelete = () => {
-    Alert.alert(
-      'Confirmer la suppression',
-      'Êtes-vous sûr de vouloir supprimer cette recette?',
-      [
-        { text: 'Annuler', style: 'cancel' },
-        {
-          text: 'Supprimer',
-          style: 'destructive',
-          onPress: handleDeleteRecipe,
-        },
-      ]
-    )
-  }
+  const showModal = () => setVisible(true)
+  const hideModal = () => setVisible(false)
 
   return (
     <View style={styles.container}>
@@ -68,7 +57,7 @@ const RecipeDetailsScreen = ({
           <TouchableOpacity onPress={() => onEdit(recipe, ingredients)}>
             <Icon name="pencil" size={24} color="blue" style={styles.icon} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={confirmDelete}>
+          <TouchableOpacity onPress={showModal}>
             <Icon name="trash" size={24} color="red" style={styles.icon} />
           </TouchableOpacity>
           <TouchableOpacity onPress={onBack}>
@@ -80,6 +69,13 @@ const RecipeDetailsScreen = ({
             />
           </TouchableOpacity>
         </View>
+        <ConfirmationModal
+          visible={visible}
+          title={'Confirmer la suppression'}
+          message={'Êtes vous sûr de vouloir supprimer cette recette ?'}
+          onConfirm={handleDeleteRecipe}
+          onCancel={hideModal}
+        />
       </View>
       <Text style={styles.description}>{recipe.description}</Text>
       <Text style={styles.subtitle}>Ingrédients :</Text>

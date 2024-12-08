@@ -1,5 +1,6 @@
 import React from 'react'
-import { View, Text, StyleSheet, Modal, Button } from 'react-native'
+import { View, Text, StyleSheet, Modal } from 'react-native'
+import { Button } from 'react-native-paper'
 
 type ConfirmationModalProps = {
   visible: boolean
@@ -10,6 +11,7 @@ type ConfirmationModalProps = {
 
 const ConfirmationModal = ({
   visible,
+  title,
   message,
   onConfirm,
   onCancel,
@@ -23,10 +25,15 @@ const ConfirmationModal = ({
     >
       <View style={styles.modalOverlay}>
         <View style={styles.modalView}>
+          <Text style={styles.modalTitle}>{title}</Text>
           <Text style={styles.modalText}>{message}</Text>
           <View style={styles.modalButtonContainer}>
-            <Button title="Annuler" onPress={onCancel} />
-            <Button title="Confirmer" onPress={onConfirm} color="red" />
+            <Button buttonColor={'red'} mode="contained" onPress={onCancel}>
+              Annuler
+            </Button>
+            <Button mode="contained" onPress={onConfirm}>
+              Confirmer
+            </Button>
           </View>
         </View>
       </View>
@@ -60,6 +67,11 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     textAlign: 'center',
     fontSize: 18,
+  },
+  modalTitle: {
+    marginBottom: 15,
+    textAlign: 'center',
+    fontSize: 22,
   },
   modalButtonContainer: {
     flexDirection: 'row',
