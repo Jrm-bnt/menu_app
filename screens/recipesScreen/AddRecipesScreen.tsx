@@ -181,13 +181,13 @@ const AddRecipesScreen = ({
         style={styles.input}
         placeholder="Nom de la recette"
         value={name}
-        onChangeText={setName}
+        onChangeText={(text) => setName(text)}
       />
       <TextInput
         style={styles.input}
         placeholder="Description"
         value={description}
-        onChangeText={setDescription}
+        onChangeText={(text) => setDescription(text)}
       />
       <Text style={styles.ingredientsTitle}>Liste des ingrédients</Text>
       <View style={styles.ingredientContainer}>
@@ -195,19 +195,19 @@ const AddRecipesScreen = ({
           style={styles.ingredientInput}
           placeholder="Nom"
           value={ingredientName}
-          onChangeText={setIngredientName}
+          onChangeText={(text) => setIngredientName(text)}
         />
         <TextInput
           style={styles.ingredientInput}
           placeholder="Quantité"
           value={ingredientQuantity}
-          onChangeText={setIngredientQuantity}
+          onChangeText={(text) => setIngredientQuantity(text)}
         />
         <TextInput
           style={styles.ingredientInput}
           placeholder="Unité"
           value={ingredientUnit}
-          onChangeText={setIngredientUnit}
+          onChangeText={(text) => setIngredientUnit(text)}
         />
         <Button title="+" onPress={handleAddIngredient} />
       </View>

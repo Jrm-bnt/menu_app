@@ -17,21 +17,24 @@ export default function App() {
   useEffect(() => {
     const checkForUpdates = async () => {
       try {
-        const update = await Updates.checkForUpdateAsync()
-        if (update.isAvailable) {
-          await Updates.fetchUpdateAsync()
-          Alert.alert(
-            'Mise à jour disponible',
-            'Une nouvelle version est disponible. L’application va redémarrer.',
-            [
-              {
-                text: 'OK',
-                onPress: async () => {
-                  await Updates.reloadAsync()
+        // Only check for updates in production builds, not in Expo Go
+        if (Updates.isEmbeddedLaunch) {
+          const update = await Updates.checkForUpdateAsync()
+          if (update.isAvailable) {
+            await Updates.fetchUpdateAsync()
+            Alert.alert(
+              'Mise à jour disponible',
+              'Une nouvelle version est disponible. L\'application va redémarrer.',
+              [
+                {
+                  text: 'OK',
+                  onPress: async () => {
+                    await Updates.reloadAsync()
+                  },
                 },
-              },
-            ]
-          )
+              ]
+            )
+          }
         }
       } catch (e) {
         console.error('Erreur lors de la vérification des mises à jour :', e)

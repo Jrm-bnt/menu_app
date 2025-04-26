@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { BottomNavigation } from 'react-native-paper'
+import CustomBottomNavigation from '../components/CustomBottomNavigation'
 import HomeScreen from '../screens/homeScreen/HomeScreen'
 import SettingScreen from '../screens/settingsScreen/SettingScreen'
 import ShoppingListScreen from '../screens/shoppingScreen/ShoppingListScreen'
@@ -44,7 +45,7 @@ export const BottomTabNavigator = ({ session }: { session: any }) => {
 
   return (
     <View style={styles.container}>
-      <BottomNavigation
+      <CustomBottomNavigation
         navigationState={{ index, routes }}
         onIndexChange={setIndex}
         renderScene={renderScene}
